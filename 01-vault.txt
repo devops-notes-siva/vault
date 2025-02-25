@@ -1,0 +1,18 @@
+vault download link:
+
+https://developer.hashicorp.com/vault/install#linux
+
+Manual steps:
+------------
+sudo yum update -y
+sudo yum install -y wget unzip
+wget https://releases.hashicorp.com/vault/1.13.0/vault_1.13.0_linux_amd64.zip
+unzip vault_1.13.0_linux_amd64.zip
+sudo mv vault /usr/local/bin/
+vault --version
+
+
+Start/stop modes:
+--------------
+1)dev mode, 2) server mode
+$ vault server -dev
