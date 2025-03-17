@@ -7,7 +7,7 @@ $ vault operator unseal <key>
 
 finally
 ----------
-$ vault login
+$ vault login <root_token>
 
 when we run vault in dev mode it will run in-memory
 $ vault server -dev
@@ -16,6 +16,75 @@ $ vault server -dev
 Run Vault with the -dev-listen-address flag and bind it to all IP addresses (0.0.0.0) like so: This will make Vault accessible to external devices on your network, including your browser, using the IP address of your VM.
 
 $ vault server -dev -dev-listen-address="0.0.0.0:8200"
+
+========================================================================
+==========================================================================
+vault configuration file;
+---------------------------
+sudo vi /etc/vault.d/vault.hcl
+        # Set the Vault data storage backend (e.g., file, Consul, etcd)
+        storage "file" {
+        path = "/opt/vault/data"
+        }
+
+        # Configure the listener (HTTP or TCP) and the address Vault will listen on
+        listener "tcp" {
+        address     = "0.0.0.0:8200"
+        tls_disable = 1  # Set to 0 for TLS (recommended in production)
+        }
+
+        # Enable the API for vault
+        api_addr = "http://127.0.0.1:8200"
+
+        # Enable the UI for Vault (optional)
+        ui = true
+
+        # Set the maximum TTL for Vault's authentication tokens
+        default_lease_ttl = "768h"
+        max_lease_ttl = "8760h"
+
+        # Log level (optional)
+        log_level = "info"
+
+        # Define the seal method (e.g., transit, AWS KMS, etc.)
+        seal "transit" {
+        address = "http://localhost:8200"
+        key_name = "vault-key"
+        mount_path = "transit/"
+        }
+
+        # Enable audit logging (optional but recommended)
+        audit "file" {
+        path = "/var/log/vault_audit.log"
+        }
+
+Create a systemd service file for Vault:
+    sudo vi /etc/systemd/system/vault.service
+        [Unit]
+        Description=HashiCorp Vault
+        Documentation=https://www.vaultproject.io/docs
+        After=network.target
+
+        [Service]
+        User=vault
+        Group=vault
+        ExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl
+        ExecReload=/bin/kill -HUP $MAINPID
+        KillSignal=SIGINT
+        Restart=on-failure
+        LimitNOFILE=8192
+        LimitMEMLOCK=infinity
+
+        [Install]
+        WantedBy=multi-user.target
+
+Create a Vault user:
+        sudo useradd --system --home /etc/vault.d --shell /bin/false vault
+Reload systemd and start Vault:
+        sudo systemctl daemon-reload
+        sudo systemctl enable vault
+        sudo systemctl start vault
+
 
 
 
@@ -76,5 +145,11 @@ vault configurations with https, including configuration file
         Timeout 300
         </VirtualHost>
 
+-> Start Vault Server
+     $ vault server -config=/path/to/vault.hcl
 
--
+
+-> Set Up Environment Variables (Optional)
+    $ export VAULT_ADDR="https://vault.mydomain.com:8200"
+
+-> Enable and Start Apache HTTPD (Optional)
