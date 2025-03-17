@@ -1,0 +1,12 @@
+$vault
+to initialize vault
+---------------------
+$ vault operator init 
+$ vault status
+$ vault operator unseal <key>
+finally
+----------
+$ vault login
+
+when we run vault in dev mode it will run in-memory
+$ vault server -dev
