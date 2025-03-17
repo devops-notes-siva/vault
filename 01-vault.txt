@@ -1,3 +1,16 @@
+1- Vault is developed in GO lang
+2- It is centralized secrets and encryption management system by using identity based which means authentication & authorization methods
+    secets means anything to connect and mange  may be sensitive data like passwords, pki certs, api keys...
+3- Features
+    1)secure secret storage(internal & external)
+    2)dynamic secrets like topts
+    3)data encryption
+    4)leasing and renewal
+    5)revocation
+4- Use cases
+    general secret storage, employee credentails storage, api key generations for scripts(iam), data encryption, automated pki infrasture, credential rotation for DB, dynamic secrets..
+
+
 vault download link:
 
 https://developer.hashicorp.com/vault/install#linux
@@ -16,3 +29,4 @@ Start/stop modes:
 --------------
 1)dev mode, 2) server mode
 $ vault server -dev
+
