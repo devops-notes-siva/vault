@@ -30,3 +30,11 @@ Start/stop modes:
 1)dev mode, 2) server mode
 $ vault server -dev
 
+
+Vault configurations:
+-------------------
+it is in hcl or json file
+located at /etc/vault.d/vault.hcl
+file permissions can be check uisng : $VAULT_DISABLE_FILE_PERMISIIONS_CHECK
+
+-> by default vault will be sealed, need to unseal it by creating multiple keys upto n, which leads to master key  and decryption ok keys will happen in reverese manner to decrypt master key 
