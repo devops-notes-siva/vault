@@ -4,9 +4,77 @@ to initialize vault
 $ vault operator init 
 $ vault status
 $ vault operator unseal <key>
+
 finally
 ----------
 $ vault login
 
 when we run vault in dev mode it will run in-memory
 $ vault server -dev
+
+
+Run Vault with the -dev-listen-address flag and bind it to all IP addresses (0.0.0.0) like so: This will make Vault accessible to external devices on your network, including your browser, using the IP address of your VM.
+
+$ vault server -dev -dev-listen-address="0.0.0.0:8200"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=====================================================
+======================================================
+
+vault configurations with https, including configuration file 
+-> install Vault 
+-> Create or modify the Vault configuration file (vault.hcl). This file will specify Vault’s settings and also set up the HTTPS protocol.
+
+        # Enable the HTTP listener with HTTPS settings
+        listener "tcp" {
+        address = "0.0.0.0:8200"
+        cluster_address = "0.0.0.0:8201"
+        tls_cert_file = "/path/to/vault.crt"
+        tls_key_file = "/path/to/vault.key"
+        }
+
+        # Set the backend storage (using file storage for simplicity)
+        storage "file" {
+        path = "/opt/vault/data"
+        }
+
+        # Enable the UI (this will be available via the web)
+        ui = true
+
+-> Reverse Proxy with HTTPD (Optional)
+    Edit the Apache configuration file (/etc/httpd/conf.d/vault.conf or /etc/apache2/sites-available/vault.conf depending on your distribution):
+
+        <VirtualHost *:80>
+        ServerName vault.mydomain.com
+        Redirect permanent / https://vault.mydomain.com/
+        </VirtualHost>
+
+        <VirtualHost *:443>
+        ServerName vault.mydomain.com
+
+        SSLEngine on
+        SSLCertificateFile /path/to/vault.crt
+        SSLCertificateKeyFile /path/to/vault.key
+
+        ProxyPass / https://localhost:8200/
+        ProxyPassReverse / https://localhost:8200/
+
+        # Optional: Adjust timeout settings if needed
+        Timeout 300
+        </VirtualHost>
+
+
+-
