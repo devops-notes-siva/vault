@@ -1,0 +1,90 @@
+
+documentation:
+-------------------
+https://developer.hashicorp.com/vault/api-docs
+
+
+AUthentication method types:
+--------------------------
+1)generic
+    git, applrole
+2)cloud based
+3)infra
+    kubernetes, ldap
+
+vault authentication steps:
+-----------------------------
+1) enable
+2) write -> store auth details
+3)login
+4)disable -> if not required
+
+Authentication method types:
+---------------------------------
+default auth method is token based
+
+to check th elist of auth methods:
+--------------------------------
+$ vault auth list
+
+
+token authentication:
+====================
+
+1) by default we have vault token
+2) to enable other methods
+    $ vault auth enable =<<token>>
+
+    $ vault token create
+    $ vault login token=<<token>>
+        
+    $ vault auth disable=<<token>>
+        by default if we create any authentication method, it will create at path loacted  "auth/token" in vault cluster
+    $ vault path-help auth/token
+
+    $ vault token revoke <<token>>
+
+username-password authentication:
+==============================
+1- $ vault auth list
+2- $ vault auth enable userpass
+3- $ vault write auth/userpass/users/<<name>> passowrd=<<passwd>>
+4- $ vault login -method=userpass username=<<name>> password=<<passwd>>
+5- $ vault auth disable userpass
+6- vault path-help auth/userpass
+
+in username password authentication , vault stores user & password as token only
+
+github authentication:
+========================
+1 - $ vault auth list
+2 - $ vault auth enable github
+
+in github -> settings -> organization -> teams -> you will find teams like dev and members of that team
+
+3 - $ vault write auth/github/config organization=<<organization name>>
+4 - $ vault read auth/github/config
+5 - $ vault login -method=github token=<<personal access token>>
+6 - $ vault auth disable github
+7 - $ vault path-help auth/github
+
+if we want to add any  specific team of github then:
+------------
+8 - $ vault write auth/github/map/teams/<<team name>> vaule=default (type of policy authentication)
+9 - $ vault read auth/github/map/teams/
+10 - $ vault read auth/github/map/teams/<<team name>>
+
+aws authentication: ( should learn clearly)
+=======================
+in aws point of view there are 2 methods of authentication:
+
+    1) IAM:
+    ------
+    if any aws resources (not ec2 instance) wants to access vault , first "getcaller identity" methos will get credentials and those credentials will be shared to vault
+
+    2) EC2:
+    ---------
+    ec2 instance enabled with IAM and it gets metadata and those details will be sent to vault , vault verify those details and generate keys.
+
+
+ 1 - $ vault auth enable aws
